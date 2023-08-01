@@ -115,7 +115,7 @@ def callback_inline(call):
         if call.data == "register":
             # with db.engine.begin() as conn:
             # dbc("db",f"""INSERT INTO userz (idtele, username) VALUES ({teleid}, '{uname}')""")
-            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register 'R-username-passwd'""")
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register 'username-passwd' Di ingat ya karena akan otomatis terhapus""")
             today = DT.date.today()
             def register_p(message):
                 try:
@@ -125,14 +125,17 @@ def callback_inline(call):
                     password = user_i[1] # The second (2) element is the pawssword
                     user_log = message.chat.first_name
                     len_user = len(user_i)
-                    uang = "239000"
                     # exist_u = [z[0] for z in  dbc("db","SELECT username FROM userz").fetchall()]
                     print(user_i)
-                    # dbc("db",f"""INSERT INTO userz (idtele, username, saldo, password, status) VALUES ({teleid}, '{username}', '{uang}', '{password}', '{status_register}')""")
                     if len_user == 2:
                         print("format benar")
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Registrasi {username} Success!! Silahkan login""", reply_markup=keyboard_l)
+                        bot.delete_message(message.chat.id, message.id)
+                        dbc("db",f"""INSERT INTO userz (idtele, username, password, status, dateRegister) VALUES ({teleid}, '{username}', '{password}', '{status_register}', '{today}')""")
                     else:
-                        print("format salah")
+                        print("Format Register salah!!")
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
+                        bot.delete_message(message.chat.id, message.id)
 
             #         if req_ == "R":
             #             if not username:
