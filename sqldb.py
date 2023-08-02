@@ -66,7 +66,6 @@ def dbc(x1,x2):
     with db.engine.begin() as conn:
         x1 = conn.execute(text(x2))
     return(x1)
-
 # ====================================================
 def rupiah_format(uang):
     y = str(uang)
@@ -101,7 +100,7 @@ def any_msg(message):
             reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE username = '{username_m}'""").fetchone()[0]
             saldo_akhir = rupiah_format(saldo_awal)
             print(saldo_akhir)
-            text = f"""Selamat datang di Liz SSH premium!!\nHallo {username_m}😃\nSaldo: {saldo_akhir}\nRestered: 30/01/2023\nemail : -none\nAccount SSH : 0"""
+            text = f"""Selamat datang di Liz SSH premium!!\nHallo {username_m}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`"""
             bot.send_message(message.chat.id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
     else:
         print("user belum registrasi")
@@ -156,14 +155,25 @@ def callback_inline(call):
                         pw = dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
                         print(pw)
                         if username == sts_u and password == pw:
-                            print(f"""Login as {username} Success..!!""")
+                            saldo_akun = dbc("db",f"""SELECT saldo FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                            reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                            saldo_akhir = rupiah_format(saldo_akun)
+                            text = f"""Selamat datang di Liz SSH premium!!\nHallo {username}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`"""
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
+                            bot.delete_message(message.chat.id, message.id)
+                            dbc("db",f"""UPDATE userz SET status = '{status_login}' WHERE idtele = '{teleid}'""")
+                            print(f"""Login as {username} successfuly..!!""")
                         else:
-                            print("password tidak sama")
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Password Salah silahkan coba lagi!!""", reply_markup=keyboard_l)
+                            bot.delete_message(message.chat.id, message.id)
+                            print("password Salah")
                     else:
-                        print("username salah")
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username Salah silahkan coba lagi!!""", reply_markup=keyboard_l)
+                        bot.delete_message(message.chat.id, message.id)
+                        print("username Salah")
                 except:
                     print("Format Login salah!!")
-                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Login salah!!""")
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Login salah silahkan Login ulang""", reply_markup=keyboard_l)
                     bot.delete_message(message.chat.id, message.id)
 
             bot.register_next_step_handler(sent, login_p)
