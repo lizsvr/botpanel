@@ -3,6 +3,7 @@ from sqlalchemy import *
 from telebot import types
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 import datetime as DT
+
 # load data base
 basedir = 'database/'
 database = "sqlite:///" + os.path.join(basedir, "db.sqlite")
@@ -80,7 +81,6 @@ def rupiah_format(uang):
 
 @bot.message_handler(commands=['start'])
 def any_msg(message):
-    # print(message)
     teleid = str(message.from_user.id)
     exist_id = [z[0] for z in dbc("db","SELECT idtele FROM userz").fetchall()]
     exist_user = [z[0] for z in dbc("db","SELECT username FROM userz").fetchall()]
@@ -90,7 +90,7 @@ def any_msg(message):
         sts_r = dbc("db",f"""SELECT status FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
         username_m = dbc("db",f"""SELECT username FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
         if sts_r == status_register:
-            bot.send_message(message.chat.id, "Silahkan Login Terlebih Dahulu", reply_markup=keyboard_r)
+            bot.send_message(message.chat.id, "Silahkan Login Terlebih Dahulu", reply_markup=keyboard_l)
             print("user sudah di register")
         elif teleid in exist_id and sts_r == status_logout:
             print("user belum login")
@@ -113,19 +113,15 @@ def callback_inline(call):
     if call.message:
         teleid = str(call.message.chat.id)
         if call.data == "register":
-            # with db.engine.begin() as conn:
-            # dbc("db",f"""INSERT INTO userz (idtele, username) VALUES ({teleid}, '{uname}')""")
             sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register 'username-passwd' Di ingat ya karena akan otomatis terhapus""")
             today = DT.date.today()
             def register_p(message):
                 try:
                     user_i = message.text.split("-")
-                    # req_ = user_i[0] # The second (0) element is the telegramID
-                    username = user_i[0] # The second (1) element is the username
-                    password = user_i[1] # The second (2) element is the pawssword
+                    username = user_i[0]
+                    password = user_i[1]
                     user_log = message.chat.first_name
                     len_user = len(user_i)
-                    # exist_u = [z[0] for z in  dbc("db","SELECT username FROM userz").fetchall()]
                     print(user_i)
                     if len_user == 2:
                         print("format benar")
@@ -136,40 +132,46 @@ def callback_inline(call):
                         print("Format Register salah!!")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
                         bot.delete_message(message.chat.id, message.id)
-
-            #         if req_ == "R":
-            #             if not username:
-            #                 print("Invalid Username")
-            #             elif not password:
-            #                 print("Invalid password")
-            #             elif username in exist_u:
-            #                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username already existed..""")
-            #                 bot.delete_message(message.chat.id, message.id)
-            #                 print("username Already Exist")
-            #             else:
-            #                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Registrasi {username} Success!! Silahkan login""", reply_markup=keyboard_l)
-            #                 bot.delete_message(message.chat.id, message.id)
-            #                 dbc("db",f"""INSERT INTO userz (idtele) VALUES ({teleid})""")
-            #                 # db.execute("INSERT INTO userz (idtele,username,password,status,dateRegister) VALUES (?,?,?,?,?);", (teleid, username,password,status_register,today))
-            #                 print(f"""Register as: {user_log}""")
-            #         else:
-            #             print("Gunakan 'R'-username-paswd untuk register")
-            #             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Gunakan 'R'-username-paswd untuk register""")
-            #             bot.delete_message(message.chat.id, message.id)
                 except:
-                    print("error")
-            #         print("Format Register salah!!")
-            #         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
-            #         bot.delete_message(message.chat.id, message.id)
-            #     return
+                    print("Format Register salah!!")
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
+                    bot.delete_message(message.chat.id, message.id)
+
             bot.register_next_step_handler(sent, register_p)
 
+        if call.data == "login":
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Login 'L-username-passwd'""")
+            def login_p(message):
+                try:
+                    user_i = message.text.split("-")
+                    username = user_i[0]
+                    password = user_i[1]
+                    user_log= message.chat.first_name
+                    exist = [z[0] for z in dbc("db","SELECT username FROM userz").fetchall()]
+                    sts_u = dbc("db",f"""SELECT username FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                    sts_r = dbc("db",f"""SELECT status FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                    len_user = len(user_i)
+                    print(sts_u, sts_r, exist, len_user)
+                    if username in exist and len_user == 2:
+                        pw = dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                        print(pw)
+                        if username == sts_u and password == pw:
+                            print(f"""Login as {username} Success..!!""")
+                        else:
+                            print("password tidak sama")
+                    else:
+                        print("username salah")
+                except:
+                    print("Format Login salah!!")
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Login salah!!""")
+                    bot.delete_message(message.chat.id, message.id)
+
+            bot.register_next_step_handler(sent, login_p)
 
 
 if __name__ == '__main__':
     try:
         print("Initializing Database...")
-        # Connect to local database
         db = create_engine(database, pool_pre_ping=True)
         dbc("db","CREATE TABLE IF NOT EXISTS userz (idtele varchar, username varchar, password varchar, saldo varchar DEFAULT 0, status varchar, dateRegister varchar DEFAULT 0)")
         dbc("db","CREATE TABLE IF NOT EXISTS transaksi (username varchar, tanggal varchar, akun varchar, harga varchar, status varchar)")
@@ -178,6 +180,5 @@ if __name__ == '__main__':
         print("Connected to the database")
         print("Bot Started")
         bot.infinity_polling()
-
     except Exception as error:
         print('Cause: {}'.format(error))
