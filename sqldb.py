@@ -419,7 +419,29 @@ def callback_inline(call):
                 # print(message)
                 user_in = message.text
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
-                print(exist_id)
+                if user_in in exist_id:
+                    print("angka ada ada di dalam list")
+                    sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan \nUsername + password\n Contoh: \n`lizadm,123`""", parse_mode='markdown', reply_markup=keyboard_back)
+                    bot.delete_message(message.chat.id, message.id)
+                    def create_ssh(message):
+                        try:
+                            user_i = message.text.split(",")
+                            username = user_i[0] # The second (0) element is the telegramID
+                            password = user_i[1] # The second (1) element is the username
+                            id_ = dbc("db",f"""SELECT id FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
+                            domain = dbc("db",f"""SELECT domain FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
+                            harga = dbc("db",f"""SELECT harga FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
+                            saldo_akun = dbc("db",f"""SELECT saldo FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                            ip_server = socket.gethostbyname(domain)
+                            len_msg = len(user_i)
+                            print(ip_server)
+                        except:
+                            print("tidak ada")
+                    
+                    bot.register_next_step_handler(sent, create_ssh)
+                else:
+                    print(f"Angka tidak ada di dalan list {user_in}")
+                # print(exist_id)
             bot.register_next_step_handler(sent_l, input_ssh)
 
 
