@@ -15,7 +15,7 @@ bot = telebot.TeleBot(API_TOKEN)
 ADMIN_ID = "5957002828"
 ADMIN_USERNAME = "lizid"
 ADMIN_PASSWORD = "adminliz"
-AUTH_KEY = "dani76bgr"
+AUTH_KEY = "lizid"
 
 # all status
 status_register = "register"
@@ -107,6 +107,36 @@ def member_list(ans):
         text += f"ID: `{id}` | `{username}` | `{saldo_out}` \n" 
     message = "`LIZ🇮🇩 SSH PREMIUM 📖\n\n📑Member List:`\n\n"+text
     return message
+# ====================================================
+def server_out(ip_s, domain, username, password, create, exp_acc):
+    server_o = f"""
+Thank You For Using Our Services                                            
+====== SSH & OVPN Account ======
+IP/Host       : `{ip_s}`
+Domain        : `{domain}`
+Username      : `{username}`
+Password      : `{password}`
+======== Running On Port =======
+Dropbear      : 109, 143
+SSL/TLS       : 443, 445, 777
+SSH WS SSL    : 443
+SSH WS No SSL : 8880
+Ovpn Ws       : 2086
+Port TCP      : 1194
+Port UDP      : 2200
+Port SSL      : 990
+========== Ovpn Config ==========                                            
+OVPN TCP   : `http://{domain}:89/tcp.ovpn`
+OVPN UDP   : `http://{domain}:89/udp.ovpn`                           
+OVPN SSL   : `http://{domain}:89/ssl.ovpn `                            
+BadVpn     : `7100-7200-7300`
+Created    : {create}
+Expired    : {exp_acc}
+================================
+Silahkan pilih /start untuk ke menu
+================================"""
+    return server_o
+
 # ====================================================
 
 @bot.message_handler(commands=['start'])
@@ -271,13 +301,19 @@ def callback_inline(call):
                 print("something error..!!")
 
         if call.data == "adm_back":
-            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
+            # bot.send_message(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
+            # update.callback_query
+            def reply_adm_back(message):
+                print(message)
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan Pilih menu""")
+            bot.register_next_step_handler(sent, reply_adm_back)
 
         if call.data == "add_server":
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
-            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=list_s+"\n📓 Masukan server dengan format \n`id,Region,ISP,Domain,harga` \nContoh:\n`sg1,SG,DO,sg-do.lizserver.me,10000`", parse_mode='MARKDOWN', reply_markup=keyboard_admin_back)
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=list_s+"\n📓 Masukan server dengan format \n`id,Region,ISP,Domain,harga` \nContoh:\n`sg1,SG,DO,sg-do.lizserver.me,10000`", parse_mode='MARKDOWN')
             def add_server(message):
                 try:
                     user_i = message.text.split(",")
@@ -290,9 +326,11 @@ def callback_inline(call):
                     exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                     print(len_user)
                     if idserver not in exist_id and len_user == 5:
-                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Add domain: `{domain}` Success!!""", parse_mode="MARKDOWN", reply_markup=keyboard_admin_back)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Add domain: `{domain}` Success!!""", parse_mode="MARKDOWN")
                         bot.delete_message(message.chat.id, message.id)
                         dbc("db",f"""INSERT INTO serverz (id,region,isp,domain,harga) VALUES ('{idserver}','{region}','{isp}','{domain}','{harga}')""")
+                        # dbc("db",f"""INSERT INTO transaksi (idsvr) VALUES ('{idserver}')""")
+                        # dbc("db",f"""CREATE TABLE IF NOT EXISTS transaksi ('{idserver}' varchar)""")
                         print(f"""Register as: {domain}""")
                     else:
                         print("Format salah/id sudah terdaftar silahkan periksa ulang..")
@@ -311,7 +349,7 @@ def callback_inline(call):
             list_s = list_server(server_z)
             count_server = len(server_z)
             exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
-            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=list_s+"\nEdit server dengan format \n`id,Region,ISP,Domain,harga` \nContoh:\n`sg1,SG,DO,sg-do.lizserver.me,10000`", parse_mode='MARKDOWN', reply_markup=keyboard_admin_back)
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=list_s+"\nEdit server dengan format \n`id,Region,ISP,Domain,harga` \nContoh:\n`sg1,SG,DO,sg-do.lizserver.me,10000`", parse_mode='MARKDOWN')
             def edit_server(message):
                 try:
                     user_i = message.text.split(",")
@@ -326,7 +364,7 @@ def callback_inline(call):
                     if idinput in exist_id and msg_count == 5:
                         print("input lengkap..")                        
                         dbc("db",f"""UPDATE serverz SET region = '{region}', isp = '{isp}', domain = '{domain}', harga = '{harga}' WHERE id = '{idinput}'""")
-                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Server Id: {idinput}\nRegion: {region}\nISP: {isp}\nDomain: `{domain}`\nHarga: {saldo_akhir}\nBerhasil di edit.. """, parse_mode='MARKDOWN' , reply_markup=keyboard_admin_back)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Server Id: {idinput}\nRegion: {region}\nISP: {isp}\nDomain: `{domain}`\nHarga: {saldo_akhir}\nBerhasil di edit.. """, parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
                     else:
                         print("input lebih..")
@@ -353,7 +391,7 @@ def callback_inline(call):
                 try:
                     if user_i in exist_id:
                         dbc("db",f"""DELETE FROM serverz WHERE id = '{user_i}'""")
-                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Server Sudah di hapus..!!""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_back)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Server Sudah di hapus..!!""", parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
                     else:
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""ID yang anda pilih tidak ada di daftar pilih ulang server..""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_delete_svr)
@@ -370,7 +408,7 @@ def callback_inline(call):
             exist = [z[1] for z in dbc("db","SELECT * FROM userz").fetchall()]
             member_l = member_list(userz_list)
             count_server = len(userz_list)
-            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=member_l+"\n📓 Masukan username + saldo yang ini akan topup \nContoh:\n`lizsvr,100000`", parse_mode='MARKDOWN', reply_markup=keyboard_admin_back)
+            sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=member_l+"\n📓 Masukan username + saldo yang ini akan topup \nContoh:\n`lizsvr,100000`", parse_mode='MARKDOWN')
             def add_saldo(message):
                 try:
                     user_i = message.text.split(",")
@@ -383,16 +421,16 @@ def callback_inline(call):
                         saldo_akhir = rupiah_format(saldo_)
                         saldo_input = rupiah_format(saldo)
                         dbc("db",f"""UPDATE userz SET saldo = '{saldo_}' WHERE username = '{username}'""")
-                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Topup Saldo {username} {saldo_input} berhasil.. Total saldo {saldo_akhir}""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_back)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Topup Saldo {username} {saldo_input} berhasil.. Total saldo {saldo_akhir}""", parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
                         print("saldo berhasil di update")
                     else:
                         print("bukan angka")
-                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username/input saldo salah Silahkan Ulangi..""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_back)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username/input saldo salah Silahkan Ulangi..""", parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
                 except:
                     print("input salah")
-                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""input saldo salah Silahkan Ulangi..""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_back)
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""input saldo salah Silahkan Ulangi..""", parse_mode='MARKDOWN')
                     bot.delete_message(message.chat.id, message.id)
 
             bot.register_next_step_handler(sent, add_saldo)
@@ -421,20 +459,49 @@ def callback_inline(call):
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                 if user_in in exist_id:
                     print("angka ada ada di dalam list")
-                    sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan \nUsername + password\n Contoh: \n`lizadm,123`""", parse_mode='markdown', reply_markup=keyboard_back)
+                    sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan \nUsername + password\n Contoh: \n`lizadm,123`""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
                     def create_ssh(message):
                         try:
                             user_i = message.text.split(",")
-                            username = user_i[0] # The second (0) element is the telegramID
-                            password = user_i[1] # The second (1) element is the username
+                            username = user_i[0]
+                            password = user_i[1]
                             id_ = dbc("db",f"""SELECT id FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                             domain = dbc("db",f"""SELECT domain FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                             harga = dbc("db",f"""SELECT harga FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                             saldo_akun = dbc("db",f"""SELECT saldo FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
+                            exist_uname = [z[0] for z in dbc("db",f"""SELECT username FROM transaksi WHERE idsvr = '{user_in}'""").fetchall()]
                             ip_server = socket.gethostbyname(domain)
                             len_msg = len(user_i)
-                            print(ip_server)
+                            print(exist_uname)
+                            if int(saldo_akun) < int(harga):
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Saldo anda tidak cukup Silahkan topup""", parse_mode='markdown')
+                                    bot.delete_message(message.chat.id, message.id)
+                            elif str(len_msg) >= "3":
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format input lebih""", parse_mode='markdown')
+                                bot.delete_message(message.chat.id, message.id)
+                            # elif username in exist_uname:
+                            #     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username sudah terdaftar""", parse_mode='markdown', reply_markup=keyboard_back)
+                            #     bot.delete_message(message.chat.id, message.id)
+                            else:
+                                url = "http://"+domain+f":6969/adduser/exp?user={username}&password={password}&exp=30"
+                                headers = ({'AUTH_KEY':AUTH_KEY })
+                                try :
+                                    today = DT.date.today()
+                                    exp = "31"
+                                    exp = datetime.datetime.today() + datetime.timedelta(days=int(exp))
+                                    exp = exp.strftime("%Y-%m-%d")
+                                    # requests.get(url, headers=headers)
+                                    output_req = server_out(ip_server,domain,username,password,today,exp)
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=output_req, parse_mode='markdown')
+                                    bot.delete_message(message.chat.id, message.id)
+                                    # dbc("db",f"""UPDATE userz SET saldo = '{str(int(saldo_akun) - int(harga))}' WHERE idtele = '{teleid}'""")
+                                    # dbc("db",f"""INSERT INTO transaksi (idsvr,username,tanggal) VALUES ('{user_in}','{username}','{today}')""")
+                                    # dbc("db",f"""UPDATE transaksi SET idsvr = '{user_in}', username = '{username}' WHERE idtele = '{teleid}'""")
+                                except:
+                                    print("API Belum terinstall")
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Error server tidak terhubung dengan API bots", parse_mode='markdown')
+                                    bot.delete_message(message.chat.id, message.id)
                         except:
                             print("tidak ada")
                     
@@ -444,13 +511,15 @@ def callback_inline(call):
                 # print(exist_id)
             bot.register_next_step_handler(sent_l, input_ssh)
 
+        if call.data == "dell_acc":
+            print("ini dell acc")
 
 if __name__ == '__main__':
     try:
         print("Initializing Database...")
         db = create_engine(database, pool_pre_ping=True)
         dbc("db","CREATE TABLE IF NOT EXISTS userz (idtele varchar, username varchar, password varchar, saldo varchar DEFAULT 0, status varchar, dateRegister varchar DEFAULT 0)")
-        dbc("db","CREATE TABLE IF NOT EXISTS transaksi (username varchar, tanggal varchar, akun varchar, harga varchar, status varchar)")
+        dbc("db","CREATE TABLE IF NOT EXISTS transaksi (idsvr varchar, username varchar, tanggal varchar, akun varchar, harga varchar, status varchar)")
         dbc("db","CREATE TABLE IF NOT EXISTS serverz (id varchar, region varchar, isp varchar, domain varchar, harga varchar, totalakun varchar DEFAULT 0)")
         dbc("db","CREATE TABLE IF NOT EXISTS admin (idtele varchar, username varchar, password varchar, status varchar)")
         print("Connected to the database")
