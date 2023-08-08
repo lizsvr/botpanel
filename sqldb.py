@@ -44,7 +44,7 @@ callback_logout = types.InlineKeyboardButton(text="Logout", callback_data="logou
 callback_back = types.InlineKeyboardButton(text="Back Menu", callback_data="back")
 callback_register = types.InlineKeyboardButton(text="Register", callback_data="register")
 callback_menu = types.InlineKeyboardButton(text="Menu", callback_data="menu")
-callback_settings = types.InlineKeyboardButton(text="Settings", callback_data="settings")
+callback_settings = types.InlineKeyboardButton(text="Change password", callback_data="cpass")
 callback_add_acc = types.InlineKeyboardButton(text="List Server", callback_data="add_acc")
 callback_list_acc = types.InlineKeyboardButton(text="List ACC", callback_data="list_acc")
 callback_dell_acc = types.InlineKeyboardButton(text="Dell ACC", callback_data="dell_acc")
@@ -65,6 +65,7 @@ keyboard_back = types.InlineKeyboardMarkup(row_width=2)
 keyboard_list_menu = types.InlineKeyboardMarkup(row_width=2)
 keyboard_add_acc = types.InlineKeyboardMarkup(row_width=2)
 keyboard_dell_acc = types.InlineKeyboardMarkup(row_width=2)
+keyboard_settings = types.InlineKeyboardMarkup(row_width=2)
 keyboard_admin = types.InlineKeyboardMarkup(row_width=2)
 keyboard_admin_back = types.InlineKeyboardMarkup(row_width=2)
 keyboard_admin_login = types.InlineKeyboardMarkup(row_width=2)
@@ -79,6 +80,7 @@ keyboard_m.add(callback_menu, callback_settings, callback_logout)
 keyboard_back.add(callback_back)
 keyboard_add_acc.add(callback_add_acc)
 keyboard_dell_acc.add(callback_dell_acc)
+keyboard_settings.add(callback_settings)
 keyboard_list_menu.add(callback_add_acc, callback_dell_acc, callback_list_acc, callback_back)
 keyboard_admin.add(callback_admin_topup_acc, callback_admin_server_add, callback_admin_server_edit, callback_admin_server_delete, callback_admin_logout)
 keyboard_admin_login.add(callback_admin_login)
@@ -133,10 +135,10 @@ def member_list(ans):
 def member_ssh(ans):
     text = ""
     for i in ans:
-        username = i[0]
-        created = i[1]
-        expired = i[2]
-        status = i[3]
+        username = i[1]
+        created = i[2]
+        expired = i[3]
+        status = i[4]
         text += f" ➣ `{username}` | {expired} | {status} \n" 
     message = "LIZ🇮🇩 SSH PREMIUM \n\n📑SSH List:\n"+text
     return message
@@ -210,7 +212,6 @@ def any_msg(message):
         sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = '{teleid}'""").fetchone()[0]
     except:
         dbc("db",f"""INSERT INTO admin (idtele,username,password,status) VALUES ('{ADMIN_ID}','{ADMIN_USERNAME}','{ADMIN_PASSWORD}','{status_register}')""")
-        sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = '{teleid}'""").fetchone()[0]
     
     if teleid == ADMIN_ID and sts_l == status_login:
         sent = bot.send_message(message.chat.id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
@@ -364,7 +365,7 @@ def callback_inline(call):
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Add domain: `{domain}` Success!!""", parse_mode="MARKDOWN")
                         bot.delete_message(message.chat.id, message.id)
                         dbc("db",f"""INSERT INTO serverz (id,region,isp,domain,harga) VALUES ('{idserver}','{region}','{isp}','{domain}','{harga}')""")
-                        dbc("db",f"""CREATE TABLE IF NOT EXISTS '{idserver}' (username varchar, register varchar, expired varchar, status varchar)""")
+                        dbc("db",f"""CREATE TABLE IF NOT EXISTS '{idserver}' (idtele varchar, username varchar, register varchar, expired varchar, status varchar)""")
                         print(f"""Register as: {domain}""")
                     else:
                         print("Format salah/id sudah terdaftar silahkan periksa ulang..")
@@ -531,7 +532,7 @@ def callback_inline(call):
                                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=output_req, parse_mode='markdown')
                                     bot.delete_message(message.chat.id, message.id)
                                     dbc("db",f"""UPDATE userz SET saldo = '{str(int(saldo_akun) - int(harga))}' WHERE idtele = '{teleid}'""")
-                                    dbc("db",f"""INSERT INTO '{user_in}' (username,register,expired,status) VALUES ('{username}','{today}','{exp}','{status_active}')""")
+                                    dbc("db",f"""INSERT INTO '{user_in}' (idtele,username,register,expired,status) VALUES ('{teleid}','{username}','{today}','{exp}','{status_active}')""")
                                 except:
                                     print("API Belum terinstall")
                                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Error server tidak terhubung dengan API bots", parse_mode='markdown')
@@ -567,7 +568,7 @@ def callback_inline(call):
                     sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan Username yang ada di list \n{ssh_list}""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
                     def create_ssh(message):
-                        ssh_z = dbc("db",f"""SELECT * FROM '{user_in}'""").fetchall()
+                        ssh_z = dbc("db",f"""SELECT * FROM '{user_in}' WHERE idtele = '{teleid}'""").fetchall()
                         exist_uname = [z[0] for z in dbc("db",f"""SELECT username FROM '{user_in}' WHERE status = '{status_active}'""").fetchall()]
                         user_i = message.text
                         len_msg = len(user_i)
@@ -598,7 +599,7 @@ def callback_inline(call):
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                 if user_in in exist_id:
                     print("angka ada ada di dalam list")
-                    ssh_z = dbc("db",f"""SELECT * FROM '{user_in}'""").fetchall()
+                    ssh_z = dbc("db",f"""SELECT * FROM '{user_in}' WHERE idtele = '{teleid}'""").fetchall()
                     domain = dbc("db",f"""SELECT domain FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                     ssh_list = member_ssh(ssh_z)
                     print(ssh_z)
@@ -610,6 +611,34 @@ def callback_inline(call):
                     bot.delete_message(message.chat.id, message.id)
             bot.register_next_step_handler(sent_l, list_ssh_member)
 
+        if call.data == "cpass":
+            print("ini ganti pass")
+            sent_l = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan password saat ini""", parse_mode='markdown')
+            def change_pw(message):
+                print("input password")
+                user_in = message.text
+                pw_z = [z[0] for z in dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchall()]
+                # pw_z = dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchone()
+                print(user_in, pw_z)
+                if user_in in pw_z:
+                    sent_l = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan password baru..""", parse_mode='markdown')
+                    bot.delete_message(message.chat.id, message.id)
+                    print("password benar")
+                    def new_pw(message):
+                        print(message.text)
+                        pw_new = message.text
+                        dbc("db",f"""UPDATE userz SET password = '{pw_new}' WHERE idtele = '{teleid}'""")
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Password berhasil di update /start untuk menu utama""", parse_mode='markdown')
+                        bot.delete_message(message.chat.id, message.id)
+                    bot.register_next_step_handler(sent_l, new_pw)
+                else:
+                    print("passwordn salah")
+                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Passowrd tidak sama..silahkan ulangi..""", parse_mode='markdown', reply_markup=keyboard_settings)
+                    bot.delete_message(message.chat.id, message.id)
+                
+            bot.register_next_step_handler(sent_l, change_pw)
+
+            
 
 if __name__ == '__main__':
     try:
