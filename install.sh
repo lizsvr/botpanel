@@ -36,17 +36,18 @@ pip install SQLAlchemy
 pip install requests
 cd /root/
 rm .setup.sh
-if [ -f "/etc/botpanet/.env" ]; then
+if [ -f "/etc/botpanel/.env" ]; then
 echo "Script Already Installed"
 exit 0
 fi
 mkdir /var/lib/lizsvr
 mkdir /etc/botpanel
 mkdir /etc/bot/panel/database
+wget https://${lizsvr}/apibot.sh && chmod +x apibot.sh && ./apibot.sh
+sleep 1
 cd /usr/bin/
 wget -O menu "https://${lizsvr}/menu.sh"
 sleep 1
 cd /etc/botpanel
-wget https://${akbarvpn}/sqldb.py
-wget https://${akbarvpn}/.env
-# intall all tool
+wget https://${lizsvr}/sqldb.py
+wget https://${lizsvr}/.env

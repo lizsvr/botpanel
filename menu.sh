@@ -9,6 +9,8 @@ BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 LIGHT='\033[0;37m'
+BRED="\e[41m"
+BBLUE="\e[38;5;21m"
 # ==========================================
 #information
 OK = "$ {
@@ -154,12 +156,38 @@ exit 0
 ;;
 6)
 clear
+echo "Start bot Sercive please wait..."
+systemctl daemon-reload
+systemctl enable api
+systemctl start api
+sleep 3
+clear
+echo "Start bot Sercive Success..."
 ;;
 7)
-start-menu
+clear
+echo "Stoped bot Sercive please wait..."
+systemctl daemon-reload
+systemctl stop api
+sleep 3
+clear
+echo "Stoped bot Sercive Success..."
 ;;
 8)
 clear
+echo -e "$BLUE━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$NC"
+echo -e "$BRED           Service Status            $NC"
+echo -e "$BLUE━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$NC"
+ell=active
+sts=$(systemctl status api | grep Active: | awk '{print $2}')
+if [ "$sts" == "$ell" ]; then
+echo -e " Python3 / Bot            :$GREEN [Running] $NC"
+else
+echo -e " Python3 / Bot            :$RED [Error] $NC"
+fi
+echo -e "$BLUE━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$NC"
+echo -e "$BRED---------- Scipt By LIZSVR ----------"
+echo -e "$BLUE━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$NC"
 ;;
 9)
 clear

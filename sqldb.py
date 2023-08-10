@@ -205,21 +205,13 @@ def any_msg(message):
 @bot.message_handler(commands=['admin'])
 def any_msg(message):
     teleid = str(message.from_user.id)
-    try:
-        dbc("db",f"""SELECT password FROM admin WHERE idtele = '{teleid}'""").fetchone()[0]
-        sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = '{teleid}'""").fetchone()[0]
-    except:
-        dbc("db",f"""INSERT INTO admin (idtele,username,password,status) VALUES ('{ADMIN_ID}','{ADMIN_USERNAME}','{ADMIN_PASSWORD}','{status_register}')""")
-    
     if teleid == ADMIN_ID and sts_l == status_login:
         sent = bot.send_message(message.chat.id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
     elif teleid == ADMIN_ID:
         sent = bot.send_message(message.chat.id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\nSilahkan login terlebih dahulu""", reply_markup=keyboard_admin_login)
     elif teleid in ADMIN_ID and sts_l == status_logout:
-        # print("user belum login")
         bot.send_message(message.chat.id, "Silahkan Login ulang Terlebih Dahulu", reply_markup=keyboard_admin_login)
     else:
-        # print("Maf anda bukan admin..")
         bot.send_message(message.chat.id, "Maaf anda bukan admin..")
 
 @bot.message_handler(func=lambda message: True)
@@ -646,6 +638,7 @@ if __name__ == '__main__':
         dbc("db","CREATE TABLE IF NOT EXISTS transaksi (idsvr varchar, username varchar, tanggal varchar, akun varchar, harga varchar, status varchar)")
         dbc("db","CREATE TABLE IF NOT EXISTS serverz (id varchar, region varchar, isp varchar, domain varchar, harga varchar, totalakun varchar DEFAULT 0)")
         dbc("db","CREATE TABLE IF NOT EXISTS admin (idtele varchar, username varchar, password varchar, status varchar)")
+        dbc("db",f"""INSERT INTO admin (idtele,username,password,status) VALUES ('{ADMIN_ID}','{ADMIN_USERNAME}','{ADMIN_PASSWORD}','{status_register}')""")
         print("Connected to the database")
         print("Bot Started")
         bot.infinity_polling()
