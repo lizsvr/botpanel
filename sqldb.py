@@ -195,7 +195,7 @@ def any_msg(message):
             reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE username = '{username_m}'""").fetchone()[0]
             saldo_akhir = rupiah_format(saldo_awal)
             print(saldo_akhir)
-            text = f"""Selamat datang di Liz SSH premium!!\nHallo {username_m}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`"""
+            text = f"""━━━━━━━━━━━━━━━━━━━━━\nSelamat datang di Liz SSH premium!!\nHallo {username_m}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`\n━━━━━━━━━━━━━━━━━━━━━"""
             bot.send_message(message.chat.id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
     else:
         print("user belum registrasi")
