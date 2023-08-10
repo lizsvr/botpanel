@@ -30,10 +30,11 @@ clear
 apt update && apt upgrade -y 
 apt install python3 -y
 apt install python3-pip -y
-pip install python
-pip install pyTelegramBotAPI
-pip install SQLAlchemy
-pip install requests
+pip3 install python
+pip3 install flask
+pip3 install pyTelegramBotAPI
+pip3 install SQLAlchemy
+pip3 install requests
 cd /root/
 rm .setup.sh
 if [ -f "/etc/botpanel/.env" ]; then
@@ -42,7 +43,7 @@ exit 0
 fi
 mkdir /var/lib/lizsvr
 mkdir /etc/botpanel
-mkdir /etc/bot/panel/database
+mkdir /etc/botpanel/database
 wget https://${lizsvr}/apibot.sh && chmod +x apibot.sh && ./apibot.sh
 sleep 1
 cd /usr/bin/
@@ -51,3 +52,26 @@ sleep 1
 cd /etc/botpanel
 wget https://${lizsvr}/sqldb.py
 wget https://${lizsvr}/.env
+
+tee -a /etc/systemd/system/api.service<<END
+[Unit]
+Description=My Project
+After=network.target
+
+[Service]
+WorkingDirectory=/etc/botpanel
+ExecStart=/usr/bin/python3 /etc/botpanel/sqldb.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+END
+clear
+systemctl start api
+systemctl enable api
+echo "[+] API Installation Completed."
+sleep 3
+clear
+rm -f /root/install.sh
+echo "Installation Bot Completed "
+sleep 3
