@@ -101,7 +101,7 @@ def rupiah_format(uang):
         p = y[-3:]
         q = y[:-3]
         return rupiah_format(q) + '.' + p
-        # print('Rp' + rupiah_format(q) + '.' + p)
+        print('Rp' + rupiah_format(q) + '.' + p)
 # ====================================================
 def list_server(ans):
     text = ""
@@ -178,33 +178,34 @@ def any_msg(message):
     teleid = str(message.from_user.id)
     exist_id = [z[0] for z in dbc("db","SELECT idtele FROM userz").fetchall()]
     exist_user = [z[0] for z in dbc("db","SELECT username FROM userz").fetchall()]
-    # print("Teleid /start:",teleid)
+    print("Teleid /start:",teleid)
     if teleid in exist_id:
-        # print("ada")
+        print("ada")
         sts_r = dbc("db",f"""SELECT status FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
         username_m = dbc("db",f"""SELECT username FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
         if sts_r == status_register:
             bot.send_message(message.chat.id, "Silahkan Login Terlebih Dahulu", reply_markup=keyboard_l)
-            # print("user sudah di register")
+            print("user sudah di register")
         elif teleid in exist_id and sts_r == status_logout:
-            # print("user belum login")
+            print("user belum login")
             bot.send_message(message.chat.id, "Silahkan Login ulang Terlebih Dahulu", reply_markup=keyboard_l)
         elif teleid in exist_id and sts_r == status_login:
-            # print("user sudah login")
+            print("user sudah login")
             saldo_awal = dbc("db",f"""SELECT saldo FROM userz WHERE username = '{username_m}'""").fetchone()[0]
             reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE username = '{username_m}'""").fetchone()[0]
             saldo_akhir = rupiah_format(saldo_awal)
-            # print(saldo_akhir)
+            print(saldo_akhir)
             text = f"""Selamat datang di Liz SSH premium!!\nHallo {username_m}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`"""
             bot.send_message(message.chat.id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
     else:
-        # print("user belum registrasi")
+        print("user belum registrasi")
         bot.send_message(message.chat.id, "Silahkan Register Terlebih Dahulu", reply_markup=keyboard_r)
 
 
 @bot.message_handler(commands=['admin'])
 def any_msg(message):
     teleid = str(message.from_user.id)
+    sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = {teleid}""").fetchone()[0]
     if teleid == ADMIN_ID and sts_l == status_login:
         sent = bot.send_message(message.chat.id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
     elif teleid == ADMIN_ID:
@@ -217,14 +218,14 @@ def any_msg(message):
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     try:
-        server_z = db.execute("SELECT * FROM serverz").fetchall()
+        server_z = dbc("db","SELECT * FROM serverz").fetchall()
         list_s = list_server(server_z)
         bot.send_message(message.chat.id, text="Pilih menu /start terlebih dahulu..", parse_mode='html')
         bot.delete_message(message.chat.id, message.id)
     except:
         bot.send_message(message.chat.id, text="Pilih menu /start terlebih dahulu..", parse_mode='html')
         bot.delete_message(message.chat.id, message.id)
-        # print("Something Wrong")
+        print("Something Wrong")
         
 
 
@@ -241,18 +242,18 @@ def callback_inline(call):
                     password = user_i[1]
                     user_log = message.chat.first_name
                     len_user = len(user_i)
-                    # print(user_i)
+                    print(user_i)
                     if len_user == 2:
-                        # print("format benar")
+                        print("format benar")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Registrasi {username} Success!! Silahkan login""", reply_markup=keyboard_l)
                         bot.delete_message(message.chat.id, message.id)
                         dbc("db",f"""INSERT INTO userz (idtele, username, password, status, dateRegister) VALUES ({teleid}, '{username}', '{password}', '{status_register}', '{today}')""")
                     else:
-                        # print("Format Register salah!!")
+                        print("Format Register salah!!")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
                         bot.delete_message(message.chat.id, message.id)
                 except:
-                    # print("Format Register salah!!")
+                    print("Format Register salah!!")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Register salah Silahkan ulangi /start""")
                     bot.delete_message(message.chat.id, message.id)
 
@@ -270,10 +271,10 @@ def callback_inline(call):
                     sts_u = dbc("db",f"""SELECT username FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
                     sts_r = dbc("db",f"""SELECT status FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
                     len_user = len(user_i)
-                    # print(sts_u, sts_r, exist, len_user)
+                    print(sts_u, sts_r, exist, len_user)
                     if username in exist and len_user == 2:
                         pw = dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
-                        # print(pw)
+                        print(pw)
                         if username == sts_u and password == pw:
                             saldo_akun = dbc("db",f"""SELECT saldo FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
                             reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
@@ -282,17 +283,17 @@ def callback_inline(call):
                             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
                             bot.delete_message(message.chat.id, message.id)
                             dbc("db",f"""UPDATE userz SET status = '{status_login}' WHERE idtele = '{teleid}'""")
-                            # print(f"""Login as {username} successfuly..!!""")
+                            print(f"""Login as {username} successfuly..!!""")
                         else:
                             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Password Salah silahkan coba lagi!!""", reply_markup=keyboard_l)
                             bot.delete_message(message.chat.id, message.id)
-                            # print("password Salah")
+                            print("password Salah")
                     else:
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username Salah silahkan coba lagi!!""", reply_markup=keyboard_l)
                         bot.delete_message(message.chat.id, message.id)
-                        # print("username Salah")
+                        print("username Salah")
                 except:
-                    # print("Format Login salah!!")
+                    print("Format Login salah!!")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Login salah silahkan Login ulang""", reply_markup=keyboard_l)
                     bot.delete_message(message.chat.id, message.id)
 
@@ -302,25 +303,25 @@ def callback_inline(call):
             username_m = dbc("db",f"""SELECT username FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Logout as {username_m} Successfuly..!!""")
             dbc("db",f"""UPDATE userz SET status = '{status_logout}' WHERE idtele = '{teleid}'""")
-            # print(f"""Logout successfuly..!!""")
+            print(f"""Logout successfuly..!!""")
 
         if call.data == "adm_logout": 
             username_adm = dbc("db",f"""SELECT username FROM admin WHERE idtele = '{teleid}'""").fetchone()[0]
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Logout admin as {username_adm} Successfuly..!!""")
             dbc("db",f"""UPDATE admin SET status = '{status_logout}' WHERE idtele = '{teleid}'""")
-            # print(f"""Logout successfuly..!!""")
+            print(f"""Logout successfuly..!!""")
 
         if call.data == "adm_login":
             try:
                 sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan password {ADMIN_USERNAME}""")
                 def reply_adm_login(message):
                     if message.text == ADMIN_PASSWORD:
-                        # print("success login admin")
+                        print("success login admin")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
                         bot.delete_message(message.chat.id, message.id)
                         dbc("db",f"""UPDATE admin SET status = '{status_login}' WHERE idtele = '{teleid}'""")
                     else:
-                        # print("password admin salah")
+                        print("password admin salah")
                         text1 = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Password salah silahkan masukan ulang..""", reply_markup=keyboard_admin_login)
                         bot.delete_message(message.chat.id, message.id)
                         
@@ -331,7 +332,7 @@ def callback_inline(call):
         if call.data == "adm_back":
             sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
             def reply_adm_back(message):
-                # print(message)
+                print(message)
                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan Pilih menu""")
             bot.register_next_step_handler(sent, reply_adm_back)
 
@@ -350,26 +351,26 @@ def callback_inline(call):
                     harga = user_i[4]
                     len_user = len(user_i)
                     exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
-                    # print(len_user)
+                    print(len_user)
                     if idserver not in exist_id and len_user == 5:
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Add domain: `{domain}` Success!!""", parse_mode="MARKDOWN")
                         bot.delete_message(message.chat.id, message.id)
                         dbc("db",f"""INSERT INTO serverz (id,region,isp,domain,harga) VALUES ('{idserver}','{region}','{isp}','{domain}','{harga}')""")
                         dbc("db",f"""CREATE TABLE IF NOT EXISTS '{idserver}' (idtele varchar, username varchar, register varchar, expired varchar, status varchar)""")
-                        # print(f"""Register as: {domain}""")
+                        print(f"""Register as: {domain}""")
                     else:
-                        # print("Format salah/id sudah terdaftar silahkan periksa ulang..")
+                        print("Format salah/id sudah terdaftar silahkan periksa ulang..")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""ID server sudah terdaftar/format lebih silahkan periksa add ulang.. /start untuk ke menu utama""", parse_mode="MARKDOWN", reply_markup=keyboard_admin_add_svr)
                         bot.delete_message(message.chat.id, message.id)
                 except:
-                    # print("Format salah silahkan periksa ulang..")
+                    print("Format salah silahkan periksa ulang..")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""`Format salah silahkan periksa ulang..`""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_add_svr)
                     bot.delete_message(message.chat.id, message.id)
                     
             bot.register_next_step_handler(sent, add_server)
 
         if call.data == "edit_server":
-            # print("ini edit server")
+            print("ini edit server")
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
@@ -385,25 +386,25 @@ def callback_inline(call):
                     harga = user_i[4]
                     msg_count = len(user_i)
                     saldo_akhir = rupiah_format(harga)
-                    # # print(type(msg_count))
+                    # print(type(msg_count))
                     if idinput in exist_id and msg_count == 5:
-                        # print("input lengkap..")                        
+                        print("input lengkap..")                        
                         dbc("db",f"""UPDATE serverz SET region = '{region}', isp = '{isp}', domain = '{domain}', harga = '{harga}' WHERE id = '{idinput}'""")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Server Id: {idinput}\nRegion: {region}\nISP: {isp}\nDomain: `{domain}`\nHarga: {saldo_akhir}\nBerhasil di edit.. """, parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
                     else:
-                        # print("input lebih..")
+                        print("input lebih..")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format lebih Silahkan ulangi.. /admin untuk menu utama""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_edit_svr)
                         bot.delete_message(message.chat.id, message.id)
                 except:
-                    # print("Format salah/kurang..")
+                    print("Format salah/kurang..")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format Salah/Kurang Silahkan ulangi.. /admin untuk menu utama""", parse_mode='MARKDOWN' , reply_markup=keyboard_admin_edit_svr)
                     bot.delete_message(message.chat.id, message.id)
                     
             bot.register_next_step_handler(sent, edit_server)
 
         if call.data == "delete_server":
-            # print("ini Delete Server")
+            print("ini Delete Server")
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
@@ -429,7 +430,7 @@ def callback_inline(call):
             bot.register_next_step_handler(sent, delete_server)
 
         if call.data == "topup_member":
-            # print("ini topup")
+            print("ini topup")
             userz_list = dbc("db",f"""SELECT * FROM userz""").fetchall()
             exist = [z[1] for z in dbc("db","SELECT * FROM userz").fetchall()]
             member_l = member_list(userz_list)
@@ -440,7 +441,7 @@ def callback_inline(call):
                     user_i = message.text.split(",")
                     username = user_i[0]
                     saldo = user_i[1]
-                    # print(exist)
+                    print(exist)
                     if username in exist and int(saldo):
                         saldo_awal = dbc("db",f"""SELECT saldo FROM userz WHERE username = '{username}'""").fetchone()[0]
                         saldo_ = (int(saldo_awal) + int(saldo))
@@ -449,13 +450,13 @@ def callback_inline(call):
                         dbc("db",f"""UPDATE userz SET saldo = '{saldo_}' WHERE username = '{username}'""")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Topup Saldo {username} {saldo_input} berhasil.. Total saldo {saldo_akhir}""", parse_mode='MARKDOWN')
                         bot.delete_message(message.chat.id, message.id)
-                        # print("saldo berhasil di update")
+                        print("saldo berhasil di update")
                     else:
-                        # print("bukan angka")
+                        print("bukan angka")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Username/input saldo salah Silahkan Ulangi /admin untuk menu utama..""", parse_mode='MARKDOWN', reply_markup=keyboard_admin_topup_acc)
                         bot.delete_message(message.chat.id, message.id)
                 except:
-                    # print("input salah")
+                    print("input salah")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""input saldo salah Silahkan Ulangi /admin untuk menu utama...""", parse_mode='MARKDOWN', reply_markup=keyboard_admin_topup_acc)
                     bot.delete_message(message.chat.id, message.id)
 
@@ -469,22 +470,22 @@ def callback_inline(call):
             saldo_awal = dbc("db",f"""SELECT saldo FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
             reg_date = dbc("db",f"""SELECT dateRegister FROM userz WHERE idtele = '{teleid}'""").fetchone()[0]
             saldo_akhir = rupiah_format(saldo_awal)
-            # # print(saldo_akhir)
+            # print(saldo_akhir)
             text = f"""Selamat datang di Liz SSH premium!!\nHallo {username_m}!!\nSaldo : {saldo_akhir}\nRestered: {reg_date}\nID anda : `{teleid}`"""
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text ,parse_mode='markdown', reply_markup=keyboard_m)
 
         if call.data == "add_acc":
-            # print("ini add acc")
+            print("ini add acc")
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
             sent_l = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""{list_s}\nPilih dari [ 1 - {count_server} ]""", parse_mode='markdown')
             def input_ssh(message):
-                # # print(message)
+                # print(message)
                 user_in = message.text
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                 if user_in in exist_id:
-                    # print("angka ada ada di dalam list")
+                    print("angka ada ada di dalam list")
                     sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan \nUsername + password\n Contoh: \n`lizadm,123`""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
                     def create_ssh(message):
@@ -499,10 +500,10 @@ def callback_inline(call):
                             exist_uname = [z[0] for z in dbc("db",f"""SELECT username FROM '{user_in}' WHERE status = '{status_active}'""").fetchall()]
                             ip_server = socket.gethostbyname(domain)
                             len_msg = len(user_i)
-                            # print(exist_uname)
+                            print(user_i)
                             if int(saldo_akun) < int(harga):
-                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Saldo anda tidak cukup Silahkan topup""", parse_mode='markdown')
-                                    bot.delete_message(message.chat.id, message.id)
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Saldo anda tidak cukup Silahkan topup""", parse_mode='markdown')
+                                bot.delete_message(message.chat.id, message.id)
                             elif str(len_msg) >= "3":
                                 bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Format input lebih""", parse_mode='markdown')
                                 bot.delete_message(message.chat.id, message.id)
@@ -512,37 +513,37 @@ def callback_inline(call):
                             else:
                                 url = "http://"+domain+f":6969/adduser/exp?user={username}&password={password}&exp=30"
                                 headers = ({'AUTH_KEY':AUTH_KEY })
-                                try :
-                                    today = DT.date.today()
-                                    exp = "31"
-                                    exp = datetime.datetime.today() + datetime.timedelta(days=int(exp))
-                                    exp = exp.strftime("%Y-%m-%d")
-                                    # requests.get(url, headers=headers)
+                                today = DT.date.today()
+                                exp = "31"
+                                exp = datetime.datetime.today() + datetime.timedelta(days=int(exp))
+                                exp = exp.strftime("%Y-%m-%d")
+                                try:
+                                    requests.get(url, headers=headers, timeout=3)
                                     output_req = server_out(ip_server,domain,username,password,today,exp)
                                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=output_req, parse_mode='markdown')
                                     bot.delete_message(message.chat.id, message.id)
                                     dbc("db",f"""UPDATE userz SET saldo = '{str(int(saldo_akun) - int(harga))}' WHERE idtele = '{teleid}'""")
                                     dbc("db",f"""INSERT INTO '{user_in}' (idtele,username,register,expired,status) VALUES ('{teleid}','{username}','{today}','{exp}','{status_active}')""")
                                 except:
-                                    # print("API Belum terinstall")
-                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Error server tidak terhubung dengan API bots", parse_mode='markdown')
+                                    print("API Belum terinstall")
+                                    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Error server tidak terhubung dengan API bot", parse_mode='markdown')
                                     bot.delete_message(message.chat.id, message.id)
                         except:
-                            # print("tidak ada")
-                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Input salah Silahkan ulangi atau /start untuk ke menu utama """, parse_mode='markdown', reply_markup=keyboard_add_acc )
+                            print("tidak ada")
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Input salah atau Api tidak terhubung dengan server /start untuk ke menu utama """, parse_mode='markdown', reply_markup=keyboard_add_acc )
                             bot.delete_message(message.chat.id, message.id)
                     
                     bot.register_next_step_handler(sent, create_ssh)
 
                 else:
-                    # print(f"Angka tidak ada di dalan list {user_in}")
+                    print(f"Angka tidak ada di dalan list {user_in}")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Id server tidak ada di list Silahkan ulangi atau /start untuk ke menu utama """, parse_mode='markdown', reply_markup=keyboard_add_acc )
                     bot.delete_message(message.chat.id, message.id)
 
             bot.register_next_step_handler(sent_l, input_ssh)
 
         if call.data == "dell_acc":
-            # print("ini dell acc")
+            print("ini dell acc")
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
@@ -551,10 +552,11 @@ def callback_inline(call):
                 user_in = message.text
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                 if user_in in exist_id:
-                    # print("angka ada ada di dalam list")
+                    print("angka ada ada di dalam list")
                     ssh_z = dbc("db",f"""SELECT * FROM '{user_in}' WHERE idtele = '{teleid}'""").fetchall()
+                    domain = dbc("db",f"""SELECT domain FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                     ssh_list = member_ssh(ssh_z)
-                    # print(ssh_z)
+                    print(ssh_z)
                     sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan Username yang ada di list \n{ssh_list}""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
                     def create_ssh(message):
@@ -562,24 +564,30 @@ def callback_inline(call):
                         exist_uname = [z[0] for z in dbc("db",f"""SELECT username FROM '{user_in}' WHERE status = '{status_active}'""").fetchall()]
                         user_i = message.text
                         len_msg = len(user_i)
+                        url = "http://"+domain+f":6969/deluser?user={user_i}"
+                        headers = ({'AUTH_KEY':AUTH_KEY })
                         if user_i in exist_uname:
-                            # print("username ada")
-                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""User id {user_i} Berhasil di hapus /start untuk ke menu""", parse_mode='markdown')
-                            bot.delete_message(message.chat.id, message.id)
-                            dbc("db",f"""DELETE FROM '{user_in}' WHERE username = '{user_i}'""")
+                            try:
+                                requests.get(url, headers=headers, timeout=3)
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""User id {user_i} Berhasil di hapus /start untuk ke menu""", parse_mode='markdown')
+                                bot.delete_message(message.chat.id, message.id)
+                                dbc("db",f"""DELETE FROM '{user_in}' WHERE username = '{user_i}'""")
+                            except:
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Api server tidak terhubung /start untuk ke menu""", parse_mode='markdown')
+                                bot.delete_message(message.chat.id, message.id)
                         else:
-                            # print("username tidak ada")
+                            print("username tidak ada")
                             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""User id {user_i} Tidak terdatar /start untuk ke menu""", parse_mode='markdown')
                             bot.delete_message(message.chat.id, message.id)
                     bot.register_next_step_handler(sent, create_ssh)
                 else:
-                    # print(f"Angka tidak ada di dalan list {user_in}")
+                    print(f"Angka tidak ada di dalan list {user_in}")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Id server tidak ada di list Silahkan ulangi atau /start untuk ke menu utama """, parse_mode='markdown', reply_markup=keyboard_dell_acc )
                     bot.delete_message(message.chat.id, message.id)
             bot.register_next_step_handler(sent_l, delete_ssh)
 
         if call.data == "list_acc":
-            # print("ini list account")
+            print("ini list account")
             server_z = dbc("db",f"""SELECT * FROM serverz""").fetchall()
             list_s = list_server(server_z)
             count_server = len(server_z)
@@ -588,41 +596,41 @@ def callback_inline(call):
                 user_in = message.text
                 exist_id = [z[0] for z in dbc("db",f"""SELECT id FROM serverz""").fetchall()]
                 if user_in in exist_id:
-                    # print("angka ada ada di dalam list")
+                    print("angka ada ada di dalam list")
                     ssh_z = dbc("db",f"""SELECT * FROM '{user_in}' WHERE idtele = '{teleid}'""").fetchall()
                     domain = dbc("db",f"""SELECT domain FROM serverz WHERE id = '{user_in}'""").fetchone()[0]
                     ssh_list = member_ssh(ssh_z)
-                    # print(ssh_z)
+                    print(ssh_z)
                     sent = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""List member `{domain}` \n{ssh_list}""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
                 else:
-                    # print(f"Angka tidak ada di dalan list {user_in}")
+                    print(f"Angka tidak ada di dalan list {user_in}")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Id server tidak ada di list Silahkan ulangi atau /start untuk ke menu utama """, parse_mode='markdown', reply_markup=keyboard_dell_acc )
                     bot.delete_message(message.chat.id, message.id)
             bot.register_next_step_handler(sent_l, list_ssh_member)
 
         if call.data == "cpass":
-            # print("ini ganti pass")
+            print("ini ganti pass")
             sent_l = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan password saat ini""", parse_mode='markdown')
             def change_pw(message):
-                # print("input password")
+                print("input password")
                 user_in = message.text
                 pw_z = [z[0] for z in dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchall()]
                 # pw_z = dbc("db",f"""SELECT password FROM userz WHERE idtele = '{teleid}'""").fetchone()
-                # print(user_in, pw_z)
+                print(user_in, pw_z)
                 if user_in in pw_z:
                     sent_l = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Silahkan masukan password baru..""", parse_mode='markdown')
                     bot.delete_message(message.chat.id, message.id)
-                    # print("password benar")
+                    print("password benar")
                     def new_pw(message):
-                        # print(message.text)
+                        print(message.text)
                         pw_new = message.text
                         dbc("db",f"""UPDATE userz SET password = '{pw_new}' WHERE idtele = '{teleid}'""")
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Password berhasil di update /start untuk menu utama""", parse_mode='markdown')
                         bot.delete_message(message.chat.id, message.id)
                     bot.register_next_step_handler(sent_l, new_pw)
                 else:
-                    # print("passwordn salah")
+                    print("passwordn salah")
                     bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"""Passowrd tidak sama..silahkan ulangi..""", parse_mode='markdown', reply_markup=keyboard_settings)
                     bot.delete_message(message.chat.id, message.id)
                 

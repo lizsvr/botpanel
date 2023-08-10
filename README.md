@@ -28,6 +28,10 @@ rm -f setup.sh && apt update && apt upgrade -y && update-grub && sleep 2 && apt-
 
 • Ubuntu 18.04 & 20.04 (Recommended)
 
+### Tutorial Install
+
+•Comming soon
+
 ------------
 **Telegram**
 ------------
