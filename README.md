@@ -1,20 +1,26 @@
 ### Command Install
 
 ```
-rm -f setup.sh && apt update && apt upgrade -y && update-grub && sleep 2 && apt-get update -y && apt-get upgrade && sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip && wget https://raw.githubusercontent.com/lizsvr/botpanel/install.sh && chmod +x setup.sh && sed -i -e 's/\r$//' install.sh && screen -S install ./install.sh
+rm -f setup.sh && apt update && apt upgrade -y && update-grub && sleep 2 && apt-get update -y && apt-get upgrade && sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl unzip && wget https://raw.githubusercontent.com/lizsvr/botpanel/setup.sh && chmod +x setup.sh && sed -i -e 's/\r$//' setup.sh && screen -S setup ./setup.sh
 ```
 
 ### Fitur Bot Panel SSH [ By LIZ ]
 
-• SSH & OpenVPN
+• Create SSH and Delete Acc with bot
 
-• SSH Websocket TLS & No TLS ( CloudFlare & CloudFront )
+• Admin setting
 
-• OHP SSH & OHP Dropbear & OHP OpenVPN
+• Top up member and delete member
 
-• Backup Data ALL Service
+• Use Sqlite3 database
 
-• Restore Data ALL Service
+### Note!
+
+• Program ini hanya contoh untuk pembelajaran ya 
+
+• Silahkan Update database dengan Postgres atau yang lain 
+
+• jika ada error silahkan hubungin saya di Telegram 
 
 ### Os Supported
 
