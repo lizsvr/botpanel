@@ -1,4 +1,4 @@
-### XontolPanel ###
+### API by XontolPanel ###
 # /etc/systemd/systemd/api.service Example:
 '''
 [Unit]
@@ -41,7 +41,7 @@ def trial_ssh():
 		subprocess.check_output(f'usermod --password $(echo 1 | openssl passwd -1 -stdin) {trial}', shell=True)
 		return trial + ":" + "1"
 	else:
-		return redirect("http://t.me/XolPanel")
+		return redirect("http://t.me/liz_mine")
 
 @app.route("/adduser/exp")
 def add_user_exp():
@@ -57,7 +57,7 @@ def add_user_exp():
 		else:
 			return "success"
 	else:
-		return redirect("http://t.me/XolPanel")
+		return redirect("http://t.me/liz_mine")
 
 @app.route("/deluser")
 def deluser():
@@ -70,6 +70,6 @@ def deluser():
 		else:
 			return "success"
 	else:
-		return redirect("http://t.me/XolPanel")
+		return redirect("http://t.me/liz_mine")
 
 app.run(host=sys.argv[1], port=6969)
