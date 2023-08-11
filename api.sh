@@ -19,7 +19,7 @@ WantedBy=multi-user.target
 END
 
 cd /usr/bin
-wget https://raw.githubusercontent.com/lizsvr/botpanel/api.py
+wget https://raw.githubusercontent.com/lizsvr/botpanel/main/api.sh
 clear
 systemctl start api
 systemctl enable api
