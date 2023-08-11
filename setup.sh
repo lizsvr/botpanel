@@ -30,10 +30,11 @@ clear
 apt update && apt upgrade -y 
 apt install python3 -y
 apt install python3-pip 
-pip3 install flask
-pip3 install pyTelegramBotAPI
-pip3 install SQLAlchemy
-pip3 install requests
+pip install flask
+pip install pyTelegramBotAPI
+pip install SQLAlchemy
+pip install requests
+pip install python-dotenv
 cd /root/
 rm .setup.sh
 if [ -f "/etc/botpanel/.env" ]; then
