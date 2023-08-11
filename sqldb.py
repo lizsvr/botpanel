@@ -205,7 +205,7 @@ def any_msg(message):
 @bot.message_handler(commands=['admin'])
 def any_msg(message):
     teleid = str(message.from_user.id)
-    sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = {teleid}""").fetchone()[0]
+    sts_l = dbc("db",f"""SELECT status FROM admin WHERE idtele = {ADMIN_ID}""").fetchone()[0]
     if teleid == ADMIN_ID and sts_l == status_login:
         sent = bot.send_message(message.chat.id, text=f"""Selamat Datang {ADMIN_USERNAME} 🥰\n""", reply_markup=keyboard_admin)
     elif teleid == ADMIN_ID:
