@@ -45,12 +45,12 @@ mkdir /etc/botpanel
 mkdir /etc/botpanel/database
 sleep 1
 cd /usr/bin/
-wget -O menu "https://${lizsvr}/menu.sh"
+wget -O menu https://raw.githubusercontent.com/lizsvr/botpanel/main/menu.sh
 chmod +x menu
 sleep 1
 cd /etc/botpanel
-wget https://${lizsvr}/sqldb.py
-wget https://${lizsvr}/.env
+wget https://raw.githubusercontent.com/lizsvr/botpanel/main/sqldb.py
+wget https://raw.githubusercontent.com/lizsvr/botpanel/main/.env
 
 tee -a /etc/systemd/system/api.service<<END
 [Unit]
