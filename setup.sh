@@ -29,7 +29,7 @@ clear
 # install all tools
 apt update && apt upgrade -y 
 apt install python3 -y
-apt install python3-pip -y
+apt install python3-pip 
 pip3 install flask
 pip3 install pyTelegramBotAPI
 pip3 install SQLAlchemy

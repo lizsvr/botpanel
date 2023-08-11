@@ -46,7 +46,7 @@ echo -e ""
 case $menu in
 1)
 clear
-id_admin="$(cat ~/myfile/.env | grep ADMIN_ID | awk '{print $3}' )"
+id_admin="$(cat ~/etc/botpanel/.env | grep ADMIN_ID | awk '{print $3}' )"
 echo -e "======================================"
 echo -e ""
 echo -e "Admin id now $CYAN$id_admin $NC"
@@ -57,7 +57,7 @@ if [ -z $id_new ]; then
 echo "Please Input ID"
 exit 0
 fi
-sed -i "s/$id_admin/'$id_new'/g" /root/myfile/.env
+sed -i "s/$id_admin/'$id_new'/g" /etc/botpanel/.env
 clear
 echo -e "======================================"
 echo -e ""
@@ -68,7 +68,7 @@ exit 0
 ;;
 2)
 clear
-uname_admin="$(cat ~/myfile/.env | grep ADMIN_USERNAME | awk '{print $3}' )"
+uname_admin="$(cat ~/etc/botpanel/.env | grep ADMIN_USERNAME | awk '{print $3}' )"
 echo -e "======================================"
 echo -e ""
 echo -e "Admin username now $CYAN$uname_admin $NC"
@@ -79,7 +79,7 @@ if [ -z $uname_new ]; then
 echo "Please Input ID"
 exit 0
 fi
-sed -i "s/$uname_admin/'$uname_new'/g" /root/myfile/.env
+sed -i "s/$uname_admin/'$uname_new'/g" /etc/botpanel/.env
 clear
 echo -e "======================================"
 echo -e ""
@@ -90,7 +90,7 @@ exit 0
 ;;
 3)
 clear
-pas_admin="$(cat ~/myfile/.env | grep ADMIN_PASSWORD | awk '{print $3}' )"
+pas_admin="$(cat ~/etc/botpanel/.env | grep ADMIN_PASSWORD | awk '{print $3}' )"
 echo -e "======================================"
 echo -e ""
 echo -e "Admin password now $CYAN$pas_admin $NC"
@@ -101,7 +101,7 @@ if [ -z $pass_new ]; then
 echo "Please Input password"
 exit 0
 fi
-sed -i "s/$pas_admin/'$pass_new'/g" /root/myfile/.env
+sed -i "s/$pas_admin/'$pass_new'/g" /etc/botpanel/.env
 clear
 echo -e "======================================"
 echo -e ""
@@ -112,7 +112,7 @@ exit 0
 ;;
 4)
 clear
-bot_token="$(cat ~/myfile/.env | grep API_TOKEN | awk '{print $3}' )"
+bot_token="$(cat ~/etc/botpanel/.env | grep API_TOKEN | awk '{print $3}' )"
 echo -e "======================================"
 echo -e ""
 echo -e "Bot Token now $CYAN$bot_token $NC"
@@ -123,7 +123,7 @@ if [ -z $token_new ]; then
 echo "Please Input Bot Token"
 exit 0
 fi
-sed -i "s/$bot_token/'$token_new'/g" /root/myfile/.env
+sed -i "s/$bot_token/'$token_new'/g" /retc/botpanel/.env
 clear
 echo -e "======================================"
 echo -e ""
@@ -134,7 +134,7 @@ exit 0
 ;;
 5)
 clear
-auth_token="$(cat ~/myfile/.env | grep AUTH_KEY | awk '{print $3}' )"
+auth_token="$(cat ~/etc/botpanel/.env | grep AUTH_KEY | awk '{print $3}' )"
 echo -e "======================================"
 echo -e ""
 echo -e "Auth Token now $CYAN$auth_token $NC"
@@ -145,7 +145,7 @@ if [ -z $auth_new ]; then
 echo "Please Input Auth token"
 exit 0
 fi
-sed -i "s/$auth_token/'$auth_new'/g" /root/myfile/.env
+sed -i "s/$auth_token/'$auth_new'/g" /etc/botpanel/.env
 clear
 echo -e "======================================"
 echo -e ""
