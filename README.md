@@ -7,7 +7,7 @@ rm -f setup.sh && apt update && apt upgrade -y && update-grub && sleep 2 && apt-
 ### Command Install for API SSH server 
 
 ```
-apt update && apt upgrade -y && curl -O hhttps://raw.githubusercontent.com/lizsvr/botpanel/main/api.sh && bash api.sh
+apt update && apt upgrade -y && curl -O https://raw.githubusercontent.com/lizsvr/botpanel/main/api.sh && bash api.sh
 ```
 
 ### Fitur Bot Panel SSH [ By LIZ ]
