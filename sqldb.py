@@ -9,14 +9,7 @@ import datetime as DT
 basedir = 'database/'
 database = "sqlite:///" + os.path.join(basedir, "db.sqlite")
 
-# bot token
-# API_TOKEN = '5868093119:AAHmp1MG5NRXXtJOSNRZeoZQTE1i-IgNftk'
 load_dotenv() # get .env variable
-
-# ADMIN_ID = "5957002828"
-# ADMIN_USERNAME = "lizid"
-# ADMIN_PASSWORD = "adminliz"
-# AUTH_KEY = "lizid"
 
 ADMIN_ID = os.getenv("ADMIN_ID")
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
